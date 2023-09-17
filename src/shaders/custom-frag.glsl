@@ -59,30 +59,21 @@ void main()
 
         vec4 diffuseColor = u_Color;
 
-        diffuseColor *= 1.0 - abs(perlinNoise3D(vec3(fs_Pos) * 5.0)) - 0.4;
-
-        diffuseColor += perlinNoise3D(vec3(fs_Pos) * 10.0 * (cos(u_Time * 0.0015 + 0.9)));
-
         float diffuseBound = diffuseColor.a;
-        diffuseColor.a = 1.f;
+        diffuseColor.a = fs_Pos.y + 0.6;
 
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
         // Avoid negative lighting values
         diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);
 
-        float ambientTerm = 0.5;
+        float ambientTerm = 0.4;
 
         float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
                                                             //lit by our point light are not completely black.
 
-        // Compute final shaded color
 
-        if (diffuseBound > 0.45) {
-            out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
-        } else {
-            out_Col = vec4(0.f);
-        }
+        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
             
 }

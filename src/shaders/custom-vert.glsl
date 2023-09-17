@@ -30,8 +30,8 @@ const vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, whi
 
 
 vec3 random3(vec3 p3) {
-    vec3 p = fract(p3 * vec3(.4307,.12349,.33489));
-    p += dot(p, p.yxz+19.89);
+    vec3 p = fract(p3 * vec3(.42,.149,.3029));
+    p += dot(p, p.yxz + 19.89);
     return fract(vec3((p.x + p.y)*p.z, (p.x+p.z)*p.y, (p.y+p.z)*p.x));
 }
 
@@ -67,6 +67,62 @@ float perlinNoise3D(vec3 p) {
     return surfletSum ;
 }
 
+float noise3D(vec3 p) {
+    return length(fract(sin(vec3(p.x * 1.27, p.y * 269.5, p.z * 6.312)) * 47.5));
+}
+
+float interpNoise3D(float x,float y, float z) {
+
+    int intX = int(floor(x));
+    float fractX = fract(x);
+    int intY = int(floor(y));
+    float fractY = fract(y);
+    int intZ = int(floor(z));
+    float fractZ = fract(z);
+
+    float v1 = noise3D(vec3(intX, intY, intZ));
+    float v2 = noise3D(vec3(intX + 1, intY, intZ));
+    float v3 = noise3D(vec3(intX, intY + 1, intZ));
+    float v4 = noise3D(vec3(intX + 1, intY + 1, intZ));
+
+    float v5 = noise3D(vec3(intX, intY, intZ + 1));
+    float v6 = noise3D(vec3(intX + 1, intY, intZ + 1));
+    float v7 = noise3D(vec3(intX, intY + 1, intZ + 1));
+    float v8 = noise3D(vec3(intX + 1, intY + 1, intZ + 1));
+
+    float i1 = mix(v1, v2, fractX);
+    float i2 = mix(v3, v4, fractX);
+    float i3 = mix(v5, v6, fractX);
+    float i4 = mix(v7, v8, fractX);
+
+    float zi1 = mix(i1, i3, fractZ);
+    float zi2 = mix(i2, i4, fractZ);
+
+    return mix(zi1, zi2, fractY);
+}
+
+
+float fbm(vec3 v, float freq, float amp) {
+    float total = 0.0f;
+    float persistence = 0.5f;
+    int octaves = 6;
+
+    for(int i = 1; i <= octaves; i++) {
+        total += interpNoise3D(v.x * freq, v.y * freq, v.z * freq) * amp;
+        freq /= 100.f;
+        amp *= persistence;
+    }
+    return total;
+}
+
+float sawtooth_wave(float x, float freq, float amplitude) {
+    return (x * freq - floor(x * freq)) * amplitude; 
+}
+
+float triangle_wave(float x, float freq, float amplitude) {
+    return abs(mod((x * freq), amplitude) - (0.5 * amplitude));
+}
+
 
 void main()
 {
@@ -83,11 +139,24 @@ void main()
     vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
     fs_Pos = modelposition;
 
-    float t = cos(float(u_Time) * 0.15);
+    float t = u_Time * 0.005;
 
+    // overall fire structure
+    modelposition.y += abs(vs_Nor.y + 1.) * 2.1 * abs(perlinNoise3D(vec3(modelposition) + t * 0.5));
     modelposition.z = modelposition.z + perlinNoise3D(vec3(modelposition));
-    modelposition.x = -modelposition.x + perlinNoise3D(vec3(modelposition));
-    modelposition.y = -modelposition.y + perlinNoise3D(vec3(modelposition));
+    modelposition.x = modelposition.x + perlinNoise3D(vec3(modelposition));
+
+    // smaller fire flares using high freq, low amp FBM
+    modelposition.y -= fbm(modelposition.xyz, (vs_Nor.y + 1.0) * (80. + vs_Nor.y), 0.07 * (vs_Nor.y + 1.));
+
+    // flatten out bottom of fire and alongate top
+    modelposition.y += abs(vs_Nor.y) * 0.01;
+    modelposition.y *= 1.;
+    modelposition.y -= 1.2;
+
+    // animate fire tips
+    modelposition.y += abs(vs_Nor.y + 1.) * (triangle_wave(t * 3.0, 0.5, 2.0) * 0.3) * abs(perlinNoise3D(vec3(modelposition)));
+
 
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
