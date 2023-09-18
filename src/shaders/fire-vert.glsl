@@ -14,6 +14,8 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
 
 uniform float u_Time;
 
+uniform vec2 u_Resolution;
+
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
 in vec4 vs_Nor;             // The array of vertex normals passed to the shader
@@ -28,9 +30,8 @@ out vec4 fs_Pos;
 const vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of
                                         //the geometry in the fragment shader.
 
-
 vec3 random3(vec3 p3) {
-    vec3 p = fract(p3 * vec3(.42,.149,.3029));
+    vec3 p = fract(p3 * vec3(.4902,.199,.3929));
     p += dot(p, p.yxz + 19.89);
     return fract(vec3((p.x + p.y)*p.z, (p.x+p.z)*p.y, (p.y+p.z)*p.x));
 }
@@ -67,8 +68,9 @@ float perlinNoise3D(vec3 p) {
     return surfletSum ;
 }
 
+
 float noise3D(vec3 p) {
-    return length(fract(sin(vec3(p.x * 1.27, p.y * 269.5, p.z * 6.312)) * 47.5));
+    return length(fract(sin(vec3(p.x * 1.27, p.y * 29.5, p.z * 1.312)) * 4.5));
 }
 
 float interpNoise3D(float x,float y, float z) {
@@ -101,11 +103,10 @@ float interpNoise3D(float x,float y, float z) {
     return mix(zi1, zi2, fractY);
 }
 
-
 float fbm(vec3 v, float freq, float amp) {
     float total = 0.0f;
     float persistence = 0.5f;
-    int octaves = 6;
+    int octaves = 8;
 
     for(int i = 1; i <= octaves; i++) {
         total += interpNoise3D(v.x * freq, v.y * freq, v.z * freq) * amp;
@@ -115,18 +116,35 @@ float fbm(vec3 v, float freq, float amp) {
     return total;
 }
 
-float sawtooth_wave(float x, float freq, float amplitude) {
-    return (x * freq - floor(x * freq)) * amplitude; 
+float bias(float b, float t) {
+    return pow(t, log(b) / log(0.5));
+}
+
+float gain(float g, float t) {
+    if (t < 0.5) {
+        return bias(1.-g, 2.*t) / 2.;
+    } else {
+        return 1. - bias(1.-g, 2.- 2.*t) / 2.;
+    }
 }
 
 float triangle_wave(float x, float freq, float amplitude) {
     return abs(mod((x * freq), amplitude) - (0.5 * amplitude));
 }
 
+float sawtooth_wave(float x, float freq, float amplitude) {
+    return (x * freq - floor(x * freq)) * amplitude; 
+}
+
+float smootherstep(float edge0, float edge1, float x) {
+    x = clamp((x - edge0)/(edge1 - edge0), 0., 1.);
+    return x * x * x *( x * (x * 6. - 15.) + 10.);
+}
 
 void main()
 {
     fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation
+
 
     mat3 invTranspose = mat3(u_ModelInvTr);
     fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.
@@ -137,29 +155,34 @@ void main()
 
 
     vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
-    fs_Pos = modelposition;
 
-    float t = u_Time * 0.005;
+    float t = u_Time * 0.05;
 
-    // overall fire structure
-    modelposition.y += abs(vs_Nor.y + 1.) * 2.1 * abs(perlinNoise3D(vec3(modelposition) + t * 0.5));
-    modelposition.z = modelposition.z + perlinNoise3D(vec3(modelposition));
-    modelposition.x = modelposition.x + perlinNoise3D(vec3(modelposition));
+    // deform into tear shape 
+    modelposition.x *= 0.6 * gain(modelposition.y - 1., 0.19);
+    modelposition.z *= 0.6 * gain(modelposition.y - 1., 0.19);
+    modelposition.y *= 1.35;
 
+    // overall fire structure and movement
+    modelposition.x += bias(modelposition.y + 1., 0.9) * 0.8 * sin(modelposition.y * 5. - t) * perlinNoise3D(modelposition.xyz);
+    modelposition.z += bias(modelposition.y + 1., 0.9) * 0.8 * cos(modelposition.y * 5. - t) * perlinNoise3D(modelposition.xyz);
+
+    // carry fire upwards more using sawtooth
+    modelposition.y += bias(modelposition.y + 1., 0.9) * 0.5 * sawtooth_wave(modelposition.y - t * 0.1, 10.0, 1.0) * perlinNoise3D(modelposition.xyz);
+    
     // smaller fire flares using high freq, low amp FBM
-    modelposition.y -= fbm(modelposition.xyz, (vs_Nor.y + 1.0) * (80. + vs_Nor.y), 0.07 * (vs_Nor.y + 1.));
+    modelposition.x += fbm(modelposition.xyz * -0.9, 10., 0.35);
+    modelposition.z += fbm(modelposition.xyz * -0.9, 10., 0.35);
 
-    // flatten out bottom of fire and alongate top
-    modelposition.y += abs(vs_Nor.y) * 0.01;
-    modelposition.y *= 1.;
-    modelposition.y -= 1.2;
-
-    // animate fire tips
-    modelposition.y += abs(vs_Nor.y + 1.) * (triangle_wave(t * 3.0, 0.5, 2.0) * 0.3) * abs(perlinNoise3D(vec3(modelposition)));
-
+    // shift a bit
+    modelposition.x -= 0.2;
+    modelposition.z -= 0.3;
+    modelposition.y -= 0.5;
 
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
     gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices
+    fs_Pos = modelposition;
+
 }

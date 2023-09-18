@@ -14,7 +14,7 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
-  color: [ 0, 128, 255]
+  color: [ 255, 0, 0]
 };
 
 let icosphere: Icosphere;
@@ -50,7 +50,10 @@ function main() {
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
-  const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
+  const gl = <WebGL2RenderingContext> canvas.getContext('webgl2', {alpha : true, premultipliedAlpha: false});
+
+  
+  gl.enable(gl.BLEND);
   if (!gl) {
     alert('WebGL 2 not supported!');
   }
@@ -67,6 +70,9 @@ function main() {
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
   renderer.setCubeColor(controls.color);
   
+  gl.enable(gl.SRC_ALPHA);
+  gl.enable(gl.ONE_MINUS_SRC_ALPHA);
+  gl.enable(gl.BLEND_SRC_ALPHA);
   gl.enable(gl.DEPTH_TEST);
 
   const lambert = new ShaderProgram([
@@ -78,6 +84,12 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/custom-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/custom-frag.glsl')),
   ]);
+
+  const fire = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/fire-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/fire-frag.glsl')),
+  ]);
+
 
   // This function will be called every frame
   function tick() {
@@ -96,10 +108,8 @@ function main() {
       prevColor = controls.color;
       renderer.setCubeColor(controls.color);
     }
-    renderer.render(camera, custom, [
+    renderer.render(camera, fire, [
       icosphere,
-      // square,
-      //cube,
     ], 
     time);
     stats.end();

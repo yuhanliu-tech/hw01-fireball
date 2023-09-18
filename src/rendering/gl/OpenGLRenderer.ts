@@ -1,4 +1,4 @@
-import {mat4, vec4} from 'gl-matrix';
+import {vec2, mat4, vec4} from 'gl-matrix';
 import Drawable from './Drawable';
 import Camera from '../../Camera';
 import {gl} from '../../globals';
@@ -40,6 +40,7 @@ class OpenGLRenderer {
     prog.setViewProjMatrix(viewProj);
     prog.setGeometryColor(color);
     prog.setTime(time);
+    prog.setResolution(vec2.fromValues(this.canvas.width, this.canvas.height));
 
     for (let drawable of drawables) {
       prog.draw(drawable);
