@@ -75,9 +75,9 @@ float smootherstep(float edge0, float edge1, float x) {
 void main()
 {
     vec4 diffuseColor = u_Color;
-    vec4 fireColor = vec4(1., 1., 0., 1.);
+    vec4 fireColor = vec4(1., 0.99, 0., 1.);
     vec4 shadowColor = vec4(0.2, 0., 0., 1.);
-    vec4 tipColor = vec4(0., 0., 1., 1.);
+    vec4 tipColor = vec4(.88, 0., 0., 1.);
 
     // Calculate the diffuse term for Lambert shading
     float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
