@@ -79,12 +79,7 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
-
-  const custom = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/custom-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/custom-frag.glsl')),
-  ]);
-
+  
   const fire = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/fire-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/fire-frag.glsl')),
