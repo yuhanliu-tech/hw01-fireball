@@ -8,6 +8,13 @@ import ShaderProgram from './ShaderProgram';
 class OpenGLRenderer {
 
   color: vec4;
+  fire: vec4;
+  shadows: vec4;
+  tips: vec4;
+  turb: GLfloat;
+  texture: GLfloat;
+  size: GLfloat;
+  lift: GLfloat;
 
   constructor(public canvas: HTMLCanvasElement) {
   }
@@ -18,6 +25,28 @@ class OpenGLRenderer {
 
   setCubeColor(color: number[]) {
     this.color = vec4.fromValues(color[0]/255, color[1]/255, color[2]/255, 1);
+  }
+
+  setLift(lift: number) {
+    this.lift = lift;
+  }
+
+  setTurbulence(turb: number) {
+    this.turb = turb;
+  }
+
+  setFireSize(size: number) {
+    this.size = size;
+  }
+
+  setFireTexture(texture: number) {
+    this.texture = texture;
+  }
+
+  setFireColors(fire: number[], shadows: number[], tips: number[]) {
+    this.fire = vec4.fromValues(fire[0]/255, fire[1]/255, fire[2]/255, 1);
+    this.shadows = vec4.fromValues(shadows[0]/255, shadows[1]/255, shadows[2]/255, 1);
+    this.tips = vec4.fromValues(tips[0]/255, tips[1]/255, tips[2]/255, 1);
   }
 
   setSize(width: number, height: number) {
@@ -32,13 +61,19 @@ class OpenGLRenderer {
   render(camera: Camera, prog: ShaderProgram, drawables: Array<Drawable>, time: number) {
     let model = mat4.create();
     let viewProj = mat4.create();
-    let color = this.color;
 
     mat4.identity(model);
     mat4.multiply(viewProj, camera.projectionMatrix, camera.viewMatrix);
     prog.setModelMatrix(model);
     prog.setViewProjMatrix(viewProj);
-    prog.setGeometryColor(color);
+    prog.setGeometryColor(this.color);
+    prog.setFireColor(this.fire);
+    prog.setTurbulence(this.turb);
+    prog.setSize(this.size);
+    prog.setLift(this.lift);
+    prog.setTexture(this.texture);
+    prog.setShadowColor(this.shadows);
+    prog.setTipColor(this.tips);
     prog.setTime(time);
     prog.setResolution(vec2.fromValues(this.canvas.width, this.canvas.height));
 

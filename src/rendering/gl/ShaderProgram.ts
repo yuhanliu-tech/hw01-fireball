@@ -32,6 +32,15 @@ class ShaderProgram {
   unifTime: WebGLUniformLocation;
   unifResolution: WebGLUniformLocation;
 
+  unifFire: WebGLUniformLocation;
+  unifShadows: WebGLUniformLocation;
+  unifTips: WebGLUniformLocation;
+
+  unifTurbulence: WebGLUniformLocation;
+  unifSize: WebGLUniformLocation;
+  unifTexture: WebGLUniformLocation;
+  unifLift: WebGLUniformLocation;
+
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
 
@@ -46,12 +55,22 @@ class ShaderProgram {
     this.attrPos = gl.getAttribLocation(this.prog, "vs_Pos");
     this.attrNor = gl.getAttribLocation(this.prog, "vs_Nor");
     this.attrCol = gl.getAttribLocation(this.prog, "vs_Col");
+
     this.unifModel      = gl.getUniformLocation(this.prog, "u_Model");
     this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
     this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
     this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
     this.unifResolution   = gl.getUniformLocation(this.prog, "u_Resolution");
+
+    this.unifFire = gl.getUniformLocation(this.prog, "u_FireCol");
+    this.unifShadows = gl.getUniformLocation(this.prog, "u_ShadowCol");
+    this.unifTips = gl.getUniformLocation(this.prog, "u_TipCol");
+
+    this.unifTurbulence = gl.getUniformLocation(this.prog, "u_Turbulence");
+    this.unifSize = gl.getUniformLocation(this.prog, "u_Size");
+    this.unifTexture = gl.getUniformLocation(this.prog, "u_Texture");
+    this.unifLift   = gl.getUniformLocation(this.prog, "u_Lift");
   }
 
   use() {
@@ -82,10 +101,59 @@ class ShaderProgram {
     }
   }
 
+  setTurbulence(turb: number) {
+    this.use();
+    if (this.unifTurbulence !== -1) {
+      gl.uniform1f(this.unifTurbulence, turb);
+    }
+  }
+
+  setLift(lift: number) {
+    this.use();
+    if (this.unifLift !== -1) {
+      gl.uniform1f(this.unifLift, lift);
+    }
+  }
+
+  setSize(size: number) {
+    this.use();
+    if (this.unifSize !== -1) {
+      gl.uniform1f(this.unifSize, size);
+    }
+  }
+
+  setTexture(texture: number) {
+    this.use();
+    if (this.unifTexture !== -1) {
+      gl.uniform1f(this.unifTexture, texture);
+    }
+  }
+
   setGeometryColor(color: vec4) {
     this.use();
     if (this.unifColor !== -1) {
       gl.uniform4fv(this.unifColor, color);
+    }
+  }
+
+  setFireColor(fire: vec4) {
+    this.use();
+    if (this.unifFire !== -1) {
+      gl.uniform4fv(this.unifFire, fire);
+    }
+  }
+
+  setShadowColor(shadows: vec4) {
+    this.use();
+    if (this.unifShadows !== -1) {
+      gl.uniform4fv(this.unifShadows, shadows);
+    }
+  }
+
+  setTipColor(tips:vec4) {
+    this.use();
+    if (this.unifTips !== -1) {
+      gl.uniform4fv(this.unifTips, tips);
     }
   }
 

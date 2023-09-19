@@ -12,20 +12,50 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  tesselations: 5,
+  Tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
-  color: [ 255, 0, 0]
+  Color: [ 255, 0, 0],
+  Fire: [255, 200, 0],
+  Shadows: [50, 0, 0],
+  Tips: [190, 0, 0],
+  Turbulence: 5,
+  Texture: 10,
+  Size: 0.6,
+  Lift: 0.7,
+  'Reset':reset
+
 };
 
 let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
+
 let prevTesselations: number = 5;
-let prevColor: number[] = controls.color;
+let prevColor: number[] = controls.Color;
 let time: number = 0;
 
+let prevFire: number[] = controls.Fire;
+let prevShadows: number[] = controls.Shadows;
+let prevTips: number[] = controls.Tips;
+let prevTurb: number = controls.Turbulence;
+let prevSize: number = controls.Size;
+let prevTexture: number = controls.Texture;
+let prevLift: number = controls.Lift;
+
+function reset() {
+  controls.Tesselations = 5;
+  controls.Color = [ 255, 0, 0];
+  controls.Fire = [255, 200, 0];
+  controls.Shadows = [50, 0, 0];
+  controls.Tips = [190, 0, 0];
+  controls.Turbulence = 5;
+  controls.Texture = 10;
+  controls.Size = 0.6;
+  controls.Lift = 0.7;
+}
+
 function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
+  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.Tesselations);
   icosphere.create();
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
@@ -44,9 +74,17 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
-  gui.add(controls, 'tesselations', 0, 8).step(1);
+  gui.add(controls, 'Tesselations', 0, 8).step(1);
   gui.add(controls, 'Load Scene');
-  gui.addColor(controls, 'color');
+  gui.addColor(controls, 'Color');
+  gui.addColor(controls, 'Fire');
+  gui.addColor(controls, 'Shadows');
+  gui.addColor(controls, 'Tips');
+  gui.add(controls, 'Turbulence', 0, 20).step(0.5);
+  gui.add(controls, 'Size', 0.2, 0.8).step(0.01);
+  gui.add(controls, 'Texture', 0, 50).step(1);
+  gui.add(controls, 'Lift', 0, 1.5).step(0.1);
+  gui.add(controls, 'Reset');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -68,7 +106,12 @@ function main() {
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
-  renderer.setCubeColor(controls.color);
+  renderer.setCubeColor(controls.Color);
+  renderer.setFireColors(controls.Fire, controls.Shadows, controls.Tips);
+  renderer.setTurbulence(controls.Turbulence);
+  renderer.setFireSize(controls.Size);
+  renderer.setFireTexture(controls.Texture);
+  renderer.setLift(controls.Lift)
   
   gl.enable(gl.SRC_ALPHA);
   gl.enable(gl.ONE_MINUS_SRC_ALPHA);
@@ -92,17 +135,51 @@ function main() {
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    if(controls.tesselations != prevTesselations)
+    if(controls.Tesselations != prevTesselations)
     {
-      prevTesselations = controls.tesselations;
+      prevTesselations = controls.Tesselations;
       icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, prevTesselations);
       icosphere.create();
     }
-    if(controls.color != prevColor)
+
+    if(controls.Lift != prevLift)
     {
-      prevColor = controls.color;
-      renderer.setCubeColor(controls.color);
+      prevLift = controls.Lift;
+      renderer.setLift(controls.Lift);
     }
+
+    if(controls.Size != prevSize)
+    {
+      prevSize = controls.Size;
+      renderer.setFireSize(controls.Size);
+    }
+
+    if(controls.Texture != prevTexture)
+    {
+      prevTexture = controls.Texture;
+      renderer.setFireTexture(controls.Texture);
+    }
+
+    if(controls.Turbulence != prevTurb)
+    {
+      prevTurb = controls.Turbulence;
+      renderer.setTurbulence(controls.Turbulence);
+    }
+
+    if(controls.Color != prevColor)
+    {
+      prevColor = controls.Color;
+      renderer.setCubeColor(controls.Color);
+    }
+    
+    if(controls.Fire != prevFire || controls.Shadows != prevShadows || controls.Tips != prevTips)
+    {
+      prevFire = controls.Fire;
+      prevShadows = controls.Shadows;
+      prevTips = controls.Tips;
+      renderer.setFireColors(controls.Fire, controls.Shadows, controls.Tips);
+    }
+
     renderer.render(camera, fire, [
       icosphere,
     ], 

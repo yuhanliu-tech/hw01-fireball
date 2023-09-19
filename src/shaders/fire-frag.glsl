@@ -6,6 +6,10 @@ uniform vec4 u_Color; // The color with which to render this instance of geometr
 uniform float u_Time;
 uniform vec2 u_Resolution;
 
+uniform vec4 u_FireCol;
+uniform vec4 u_ShadowCol;
+uniform vec4 u_TipCol;
+
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
 in vec4 fs_Nor;
@@ -75,27 +79,18 @@ float smootherstep(float edge0, float edge1, float x) {
 void main()
 {
     vec4 diffuseColor = u_Color;
-    vec4 fireColor = vec4(1., 0.99, 0., 1.);
-    vec4 shadowColor = vec4(0.2, 0., 0., 1.);
-    vec4 tipColor = vec4(.88, 0., 0., 1.);
-
-    // Calculate the diffuse term for Lambert shading
-    float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
-    // Avoid negative lighting values
-    diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);
-    float ambientTerm = 0.5;
 
     // mix with secondary fire color
-    diffuseColor = mix(fireColor, diffuseColor, clamp(perlinNoise3D(u_Time * 0.05 + fs_Pos.xyz),0.3,1.));
-
+    diffuseColor = mix(u_FireCol, diffuseColor, clamp(perlinNoise3D(u_Time * 0.05 + fs_Pos.xyz),0.3,1.));
+    
     // mix back with first fire color
     diffuseColor = mix(u_Color, diffuseColor, bias(length(fs_Pos.xz), 0.2));
 
     // mix with tertiary fire color (mostly concentrated at the tips)
-    diffuseColor = mix(tipColor, diffuseColor, smoothstep(fs_Pos.y, 1., 0.6));
+    diffuseColor = mix(u_TipCol, diffuseColor, smoothstep(fs_Pos.y, 1., 0.6));
 
     // add fire shadows to center
-    diffuseColor = mix(shadowColor, diffuseColor, bias(length(fs_Pos.xz), 0.4));
+    diffuseColor = mix(u_ShadowCol, diffuseColor, bias(length(fs_Pos.xz), 0.4)); 
 
     out_Col = diffuseColor;
 

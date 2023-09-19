@@ -16,6 +16,14 @@ uniform float u_Time;
 
 uniform vec2 u_Resolution;
 
+uniform float u_Turbulence;
+
+uniform float u_Texture;
+
+uniform float u_Size;
+
+uniform float u_Lift;
+
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
 in vec4 vs_Nor;             // The array of vertex normals passed to the shader
@@ -159,16 +167,16 @@ void main()
     float t = u_Time * 0.05;
 
     // deform into tear shape 
-    modelposition.x *= 0.6 * gain(modelposition.y - 1., 0.19);
-    modelposition.z *= 0.6 * gain(modelposition.y - 1., 0.19);
-    modelposition.y *= 1.35;
+    modelposition.x *= u_Size * gain(modelposition.y - 1., 0.19);
+    modelposition.z *= u_Size * gain(modelposition.y - 1., 0.19);
+    modelposition.y *= 1.45;
 
     // overall fire structure and movement
-    modelposition.x += bias(modelposition.y + 1., 0.9) * 0.8 * sin(modelposition.y * 5. - t) * perlinNoise3D(modelposition.xyz);
-    modelposition.z += bias(modelposition.y + 1., 0.9) * 0.8 * cos(modelposition.y * 5. - t) * perlinNoise3D(modelposition.xyz);
+    modelposition.x += bias(modelposition.y + 1., 0.6) * sin(modelposition.y * u_Turbulence - t) * perlinNoise3D(modelposition.xyz);
+    modelposition.z += bias(modelposition.y + 1., 0.6) * cos(modelposition.y * u_Turbulence - t) * perlinNoise3D(modelposition.xyz);
 
     // carry fire upwards more using sawtooth
-    modelposition.y += bias(modelposition.y + 1., 0.9) * 0.5 * sawtooth_wave(modelposition.y - t * 0.1, 10.0, 1.0) * perlinNoise3D(modelposition.xyz);
+    modelposition.y += (modelposition.y + 1.) * sawtooth_wave(modelposition.y - t * 0.1, u_Texture, 1.0) * perlinNoise3D(modelposition.xyz) * u_Lift;
     
     // smaller fire flares using high freq, low amp FBM
     modelposition.x += fbm(modelposition.xyz * -0.9, 10., 0.35);
