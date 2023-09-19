@@ -81,7 +81,7 @@ function main() {
   gui.addColor(controls, 'Shadows');
   gui.addColor(controls, 'Tips');
   gui.add(controls, 'Turbulence', 0, 20).step(0.5);
-  gui.add(controls, 'Size', 0.2, 0.8).step(0.01);
+  gui.add(controls, 'Size', 0.2, 0.8).step(0.1);
   gui.add(controls, 'Texture', 0, 50).step(1);
   gui.add(controls, 'Lift', 0, 1.5).step(0.1);
   gui.add(controls, 'Reset');
