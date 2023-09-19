@@ -16,8 +16,8 @@ const controls = {
   'Load Scene': loadScene, // A function pointer, essentially
   Color: [ 255, 0, 0],
   Fire: [255, 200, 0],
-  Shadows: [50, 0, 0],
-  Tips: [190, 0, 0],
+  Shadows: [40, 10, 10],
+  Tips: [65, 13, 107],
   Turbulence: 5,
   Texture: 10,
   Size: 0.6,
@@ -46,8 +46,8 @@ function reset() {
   controls.Tesselations = 5;
   controls.Color = [ 255, 0, 0];
   controls.Fire = [255, 200, 0];
-  controls.Shadows = [50, 0, 0];
-  controls.Tips = [190, 0, 0];
+  controls.Shadows = [40, 10, 10];
+  controls.Tips = [65, 13, 107];
   controls.Turbulence = 5;
   controls.Texture = 10;
   controls.Size = 0.6;

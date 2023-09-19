@@ -87,7 +87,7 @@ void main()
     diffuseColor = mix(u_Color, diffuseColor, bias(length(fs_Pos.xz), 0.2));
 
     // mix with tertiary fire color (mostly concentrated at the tips)
-    diffuseColor = mix(u_TipCol, diffuseColor, smoothstep(fs_Pos.y, 1., 0.6));
+    diffuseColor = mix(u_TipCol, diffuseColor, smoothstep(fs_Pos.y - 0.5, 1., 0.6));
 
     // add fire shadows to center
     diffuseColor = mix(u_ShadowCol, diffuseColor, bias(length(fs_Pos.xz), 0.4)); 
