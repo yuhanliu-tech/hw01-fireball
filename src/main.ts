@@ -9,6 +9,8 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 
+import * as THREE from 'three';
+
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -105,7 +107,7 @@ function main() {
   const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
+  renderer.setClearColor(0., 0., 0., 1);
   renderer.setCubeColor(controls.Color);
   renderer.setFireColors(controls.Fire, controls.Shadows, controls.Tips);
   renderer.setTurbulence(controls.Turbulence);
