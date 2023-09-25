@@ -163,7 +163,12 @@ void main()
     vec4 temp = vec4(0.0, 0.0, 1.0, 1.0) * u_ViewProj;
     vec3 lookVec = normalize(temp.xyz);
     vec3 rayOrigin = fs_Nor.xyz - lookVec;
-    rayOrigin.y -= 0.;
+
+    // bobble with wisp head
+    rayOrigin.y -= 0.05;
+    rayOrigin.y -= 0.05 * cos(u_Time * 0.09);
+
+
     vec3 col = mix(u_Color.xyz, u_TipCol.xyz, 0.1 * length(fs_Pos.xy));
     col *= render(rayOrigin.xy);
 
