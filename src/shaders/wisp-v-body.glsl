@@ -102,6 +102,7 @@ void main()
     modelposition.x *= u_Size * 0.5 * bias(modelposition.y, 0.75);
     modelposition.z *= u_Size * 0.5 * bias(modelposition.y, 0.75);
 
+    // slight dip to create the illusion of legs
     modelposition.y /= -1. * cos(modelposition.x * 5. * (1. - 0.01 * cos(t)));
 
     modelposition.y *= 0.4;
