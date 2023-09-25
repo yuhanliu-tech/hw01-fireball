@@ -1,5 +1,12 @@
 #version 300 es
 
+//////////////
+
+// scale the icosphere so that it can be used as a "background" that adds a wispy and glowy efect
+// aside fro scaling, this is simply a passthrough shader
+
+/////////////
+
 uniform mat4 u_Model;       // The matrix that defines the transformation of the
                             // object we're rendering. In this assignment,
                             // this will be the result of traversing your scene graph.
@@ -11,12 +18,6 @@ uniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.
 uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.
                             // We've written a static matrix for you to use for HW2,
                             // but in HW3 you'll have to generate one yourself
-
-uniform float u_Time;
-
-uniform vec2 u_Resolution;
-uniform float u_Turbulence;
-uniform float u_Size;
 
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
@@ -47,13 +48,7 @@ void main()
 
     vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
 
-    float origY = modelposition.y; 
-
-    float t = u_Time * 0.1;
-
-    modelposition.x *= 5.;
-    modelposition.y *= 5.;
-    modelposition.z *= 5.;
+    modelposition.xyz *= 5.;
 
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 

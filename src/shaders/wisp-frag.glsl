@@ -1,5 +1,12 @@
 #version 300 es
 
+/////////
+
+// General fragment shader for the wisp 
+// Essentially the same as wisp-frag-head but without the code to paint eyes
+
+////////
+
 precision highp float;
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
@@ -13,10 +20,9 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // We've written a static matrix for you to use for HW2,
                             // but in HW3 you'll have to generate one yourself
 
-
 uniform vec4 u_FireCol;
 uniform vec4 u_ShadowCol;
-uniform vec4 u_TipCol;
+uniform vec4 u_TipCol; // core color
 
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
@@ -35,12 +41,11 @@ float smootherstep(float edge0, float edge1, float x) {
 
 void main()
 {
-    // TODO: Delete shadow color
+
     vec4 diffuseColor = u_Color;
 
-    float mixBg = acos(dot(normalize(fs_Nor.xyz), normalize(u_CameraPos.xyz))) / (2.5 * 3.14159);
-    mixBg = smootherstep(0., mixBg, 0.09);
-    diffuseColor = mix(vec4(0.,0.,0.,1.), diffuseColor, mixBg);
+    // smoother step improves color mixing between the three wisp colors
+    // cell shading based on camera's look direction so that the wisp appears to have a glowing center
 
     float dist = acos(dot(normalize(fs_Nor.xyz), normalize(u_CameraPos.xyz))) / (1. * 3.14159);
     dist = smootherstep(0., dist, 0.1);

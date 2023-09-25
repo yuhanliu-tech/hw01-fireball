@@ -1,5 +1,11 @@
 #version 300 es
 
+////////
+
+// vertex shader for wisp body
+
+////////
+
 uniform mat4 u_Model;       // The matrix that defines the transformation of the
                             // object we're rendering. In this assignment,
                             // this will be the result of traversing your scene graph.
@@ -102,6 +108,7 @@ void main()
     modelposition.y -= 0.6;
 
     // body movement
+    // using if-statements to ensure that the pulsing deformation is symmetric
 
     if (modelposition.x > 0.) {
         modelposition.x += 0.5 * cos(modelposition.y * u_Turbulence - t) * perlinNoise3D(modelposition.xyz);
@@ -115,9 +122,9 @@ void main()
         modelposition.z -= 0.2 * cos(modelposition.y * u_Turbulence - t) * perlinNoise3D(modelposition.xyz);
     }
 
+    // slight bobbing effect
     modelposition.y += 0.05 * sin(t);
     modelposition.y += 0.4;
-
 
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 

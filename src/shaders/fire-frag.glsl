@@ -1,5 +1,12 @@
 #version 300 es
 
+//////////////
+
+// First attempt at making a fire shader! Stylized/toony fire effect with noise. 
+
+//////////////
+
+
 precision highp float;
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.

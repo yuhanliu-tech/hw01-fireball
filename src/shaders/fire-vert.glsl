@@ -1,5 +1,11 @@
 #version 300 es
 
+//////////////
+
+// First attempt at making a fire shader! Stylized/toony fire effect with noise. 
+
+//////////////
+
 uniform mat4 u_Model;       // The matrix that defines the transformation of the
                             // object we're rendering. In this assignment,
                             // this will be the result of traversing your scene graph.

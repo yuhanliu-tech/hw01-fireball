@@ -1,5 +1,11 @@
 #version 300 es
 
+/////////////
+
+// Fragment shader for both arms, less glowy than head or body
+
+/////////////
+
 precision highp float;
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
@@ -87,11 +93,11 @@ void main()
 
     vec4 diffuseColor = u_Color;
 
-    // mix back with first fire color
-    diffuseColor = mix(u_Color, diffuseColor, bias(length(fs_Pos.xz), 0.2));
+    // add fire glow to center
+    diffuseColor = mix(u_FireCol, diffuseColor, bias(length(fs_Pos.xz), 0.9)); 
 
-    // add fire shadows to center
-    diffuseColor = mix(u_FireCol, diffuseColor, bias(length(fs_Pos.xz), 0.8)); 
+    // mix back with lighter fire color
+    diffuseColor = mix(diffuseColor, u_TipCol, bias(length(fs_Pos.xz), 0.2));
 
     out_Col = diffuseColor;
 

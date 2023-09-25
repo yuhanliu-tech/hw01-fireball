@@ -1,5 +1,11 @@
 #version 300 es
 
+//////////////
+
+// Fragment shader for the wispy noise around the Will-o'-the-Wisps
+
+//////////////
+
 precision highp float;
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
@@ -15,7 +21,7 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 
 uniform vec4 u_FireCol;
-uniform vec4 u_TipCol;
+uniform vec4 u_TipCol; // core color
 
 uniform float u_Turbulence;
 
@@ -87,7 +93,9 @@ float smootherstep(float edge0, float edge1, float x) {
 
 ///////////////////////////////////////////
 
-//noise funtion abstract from https://www.shadertoy.com/view/4sc3z2
+// Simplex Noise shader references from https://www.shadertoy.com/view/NtBXWV
+
+// No changes were made to the following 2 functions from shadertoy 
 vec3 hash33(vec3 p3)
 {
 	vec3 MOD3 = vec3(.1031, .11369, .13787);
@@ -118,32 +126,26 @@ float simplex_noise(vec3 p)
 	return dot(vec4(31.316, 31.316, 31.316, 31.316), n);
 }
 
-
+// changes made to bring shadertoy shader into webGL
 float render(vec2 uv)
 {
-    float side = smoothstep(0.5, 0.3, length(uv)) + 0.35;
-    float center = smoothstep(0.1, 0.0, length(uv)) * 1.2;
-    vec3 rd = 0.4 * vec3(uv, 0.);
+    vec3 rd = 0.9 * vec3(uv, 0.);
 
-    rd.x *= 1.9;
-    rd.y *= 7. * gain(rd.y + 0.5, 0.2) * u_Size;
+    // shape the wispy noise to have fire-like teardrop structure
+    rd.y *= 9. * gain(rd.y + 0.5, 0.2) * u_Size;
 
+    // need a few different time metrics oops
     float ti = u_Time * 0.15;
+    float time = u_Time * 0.05;
+    float t = pow(time+0.5,5.)*0.001 + 3.;
 
     rd.x += bias(rd.y + 1., 0.9) * 0.1 *  sin(rd.y * u_Turbulence - ti) * perlinNoise3D(fs_Pos.xyz);
     rd.y += bias(rd.y + 1., 0.9) * 0.1 * cos(rd.y * u_Turbulence - ti) * perlinNoise3D(fs_Pos.xyz);
 
-    float time = u_Time * 0.05;
-
-    float t = pow(time+0.5,5.)*0.001 + 3.;
-
     float n2 = simplex_noise((rd*t+t) * (1. / length(rd*t+rd)));
     
     n2 = simplex_noise((rd*t+t) * (1. / length(rd*t+rd))+(time-1.5));
-    
-    float flare = smoothstep(0.,1.,0.002 / length(rd*length(rd)*n2))*side;
-    
-    flare = flare-center*clamp((time)*10.,0.,5.);
+    float flare = smoothstep(0.,1.,0.002 / length(rd*length(rd)*n2));
     
     return flare;
 }
@@ -154,21 +156,24 @@ float render(vec2 uv)
 void main()
 {
     
+    // use for subtle background cell-shading to produce glowy and wispy effects
     float dist = acos(dot(normalize(fs_Nor.xyz), normalize(u_CameraPos.xyz))) / (14. * 3.14159);
 
+    // use look vector to apply wispy shader to area directly behind the wisp
     vec4 temp = vec4(0.0, 0.0, 1.0, 1.0) * u_ViewProj;
     vec3 lookVec = normalize(temp.xyz);
     vec3 rayOrigin = fs_Nor.xyz - lookVec;
+    rayOrigin.y -= 0.;
     vec3 col = mix(u_Color.xyz, u_TipCol.xyz, 0.1 * length(fs_Pos.xy));
-    rayOrigin.y -= 0.19;
     col *= render(rayOrigin.xy);
 
     vec4 diffuseColor = vec4(col,1.0);
  
+    // glowy effect using dist 
     dist = smootherstep(0., dist, 0.039);
-    diffuseColor = mix(diffuseColor, vec4(0.,0.,0.,1.), dist);
+    diffuseColor = mix(diffuseColor, vec4(0.,0.,0.,1.), dist + 0.05);
 
-    diffuseColor = mix(diffuseColor, u_TipCol, 0.8 - dist);
+    diffuseColor = mix(diffuseColor, u_TipCol, 0.4 - length(rayOrigin));
 
     out_Col = diffuseColor;
 

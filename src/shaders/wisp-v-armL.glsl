@@ -1,5 +1,12 @@
 #version 300 es
 
+//////////////
+
+// Vertex shader for wisp's left arm
+// Similar to vertex shader for right arm
+
+//////////////
+
 uniform mat4 u_Model;       // The matrix that defines the transformation of the
                             // object we're rendering. In this assignment,
                             // this will be the result of traversing your scene graph.
