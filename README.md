@@ -27,7 +27,7 @@ Inspired by the Will-o'-the-Wisps from Brave, I created my own wisp using proced
 * Wisp Body
 
   * I added symmetric pulsing movements in the body using Perlin noise.
-  * I also achieved the illusion of legs by dividing the vertical vertex position by the cosine of its horizontal posiiton.
+  * I also achieved the illusion of legs by dividing the vertical vertex position by the cosine of its horizontal position.
  
 * Wisp Arms
 
@@ -36,7 +36,7 @@ Inspired by the Will-o'-the-Wisps from Brave, I created my own wisp using proced
 * Extra Spice: Surrounding Effects
 
   * The surrounding effects were created by painting noise onto an enlarged icosphere that serves as the "background". View-dependent interpolation allowed me to ensure that the noise remained behind the wisp.
-  * This part was the most challenging. I ended up referencing a ShaderToy project to create a wispy effect using simplex noise. I distorted the noise in the same general way as my wisp head and linearly interpolated with the background color (black) to create the emanate and fade effect. 
+  * This part was the most challenging. I ended up referencing a [ShaderToy project](https://www.shadertoy.com/view/NtBXWV) to create a wispy effect using simplex noise. I distorted the noise in the same general way as my wisp head and linearly interpolated with the background color (black) to create the emanate and fade effect. 
 
 ## Interactivity 
 
