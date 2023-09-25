@@ -2,7 +2,7 @@
 
 [Live Demo](https://yuhanliu-tech.github.io/will-o-wisp-shader/)
 
-Inspired by the Will-o'-the-Wisps from Brave, I created my own wisp using procedural noise tools. 
+Inspired by the Will-o'-the-Wisps from Brave, I created my own wisp using procedural noise tools in WebGL and Javascript. 
 
 ## WebGL Vertex and Fragment Shaders
 
