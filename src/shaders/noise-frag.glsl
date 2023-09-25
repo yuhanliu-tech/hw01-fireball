@@ -130,6 +130,7 @@ float simplex_noise(vec3 p)
 float render(vec2 uv)
 {
     vec3 rd = 0.9 * vec3(uv, 0.);
+    rd.y *= 0.8;
 
     // shape the wispy noise to have fire-like teardrop structure
     rd.y *= 9. * gain(rd.y + 0.5, 0.2) * u_Size;
@@ -164,8 +165,8 @@ void main()
     vec3 lookVec = normalize(temp.xyz);
     vec3 rayOrigin = fs_Nor.xyz - lookVec;
 
-    // bobble with wisp head
-    rayOrigin.y -= 0.05;
+    // bobble with wisp
+    rayOrigin.y -= 0.0;
     rayOrigin.y -= 0.05 * cos(u_Time * 0.09);
 
 
