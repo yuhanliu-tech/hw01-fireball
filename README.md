@@ -4,6 +4,8 @@
 
 Inspired by the Will-o'-the-Wisps from Brave, I created my own wisp using procedural noise tools in WebGL and Javascript. 
 
+![Image](https://github.com/yuhanliu-tech/will-o-wisp-shader/blob/master/wisp.png)
+
 ## WebGL Vertex and Fragment Shaders
 
 * I broke the wisp down into components, the fiery head, body, left/right arms, and surrounding effects. Each component has its own vertex and fragment shader.
