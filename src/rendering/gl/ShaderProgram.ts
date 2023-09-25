@@ -1,4 +1,4 @@
-import {vec2, vec4, mat4} from 'gl-matrix';
+import {vec2, vec4, vec3, mat4} from 'gl-matrix';
 import Drawable from './Drawable';
 import {gl} from '../../globals';
 
@@ -33,13 +33,12 @@ class ShaderProgram {
   unifResolution: WebGLUniformLocation;
 
   unifFire: WebGLUniformLocation;
-  unifShadows: WebGLUniformLocation;
   unifTips: WebGLUniformLocation;
+
+  unifCameraPos: WebGLUniformLocation;
 
   unifTurbulence: WebGLUniformLocation;
   unifSize: WebGLUniformLocation;
-  unifTexture: WebGLUniformLocation;
-  unifLift: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -63,14 +62,13 @@ class ShaderProgram {
     this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
     this.unifResolution   = gl.getUniformLocation(this.prog, "u_Resolution");
 
+    this.unifCameraPos = gl.getUniformLocation(this.prog, "u_CameraPos");
+
     this.unifFire = gl.getUniformLocation(this.prog, "u_FireCol");
-    this.unifShadows = gl.getUniformLocation(this.prog, "u_ShadowCol");
     this.unifTips = gl.getUniformLocation(this.prog, "u_TipCol");
 
     this.unifTurbulence = gl.getUniformLocation(this.prog, "u_Turbulence");
     this.unifSize = gl.getUniformLocation(this.prog, "u_Size");
-    this.unifTexture = gl.getUniformLocation(this.prog, "u_Texture");
-    this.unifLift   = gl.getUniformLocation(this.prog, "u_Lift");
   }
 
   use() {
@@ -94,6 +92,14 @@ class ShaderProgram {
     }
   }
 
+  setCamera(cam: vec3) {
+    this.use();
+    if (this.unifCameraPos !== -1) {
+      gl.uniform4fv(this.unifCameraPos, vec4.fromValues(cam[0], cam[1], cam[2], 1.));
+    }
+
+  }
+
   setViewProjMatrix(vp: mat4) {
     this.use();
     if (this.unifViewProj !== -1) {
@@ -108,24 +114,10 @@ class ShaderProgram {
     }
   }
 
-  setLift(lift: number) {
-    this.use();
-    if (this.unifLift !== -1) {
-      gl.uniform1f(this.unifLift, lift);
-    }
-  }
-
   setSize(size: number) {
     this.use();
     if (this.unifSize !== -1) {
       gl.uniform1f(this.unifSize, size);
-    }
-  }
-
-  setTexture(texture: number) {
-    this.use();
-    if (this.unifTexture !== -1) {
-      gl.uniform1f(this.unifTexture, texture);
     }
   }
 
@@ -140,13 +132,6 @@ class ShaderProgram {
     this.use();
     if (this.unifFire !== -1) {
       gl.uniform4fv(this.unifFire, fire);
-    }
-  }
-
-  setShadowColor(shadows: vec4) {
-    this.use();
-    if (this.unifShadows !== -1) {
-      gl.uniform4fv(this.unifShadows, shadows);
     }
   }
 
