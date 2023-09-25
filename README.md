@@ -4,11 +4,13 @@
 
 Inspired by the Will-o'-the-Wisps from Brave, I created my own wisp using procedural noise tools. 
 
-# WebGL Vertex and Fragment Shaders
+## WebGL Vertex and Fragment Shaders
 
 * I broke the wisp down into components, the fiery head, body, left/right arms, and surrounding effects. Each component has its own vertex and fragment shader.
 
-* Each part of the main wisp began as an icosphere, to which I deformed using different fragment shaders. 
+* Each part of the main wisp began as an icosphere, to which I deformed using different fragment shaders.
+
+* I animated all body parts, in addition to the surrounding effects. The fire and effects colors also change with respect to time. 
 
 ## Creating the Wisp
 
@@ -29,7 +31,7 @@ Inspired by the Will-o'-the-Wisps from Brave, I created my own wisp using proced
 
   * The arm curl uses bias and trigonometric functions, creating the look of waving arms while ensuring that the shoulder/arm attachment remained relatively stable. 
   
-* Surrounding Effects
+* Extra Spice: Surrounding Effects
 
   * The surrounding effects were created by painting noise onto an enlarged icosphere that serves as the "background". View-dependent interpolation allowed me to ensure that the noise remained behind the wisp.
   * This part was the most challenging. I ended up referencing a ShaderToy project to create a wispy effect using simplex noise. I distorted the noise in the same general way as my wisp head and linearly interpolated with the background color (black) to create the emanate and fade effect. 
